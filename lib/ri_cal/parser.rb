@@ -13,6 +13,10 @@ module RiCal
           result = "#{result}#{@buffer[1..-1]}"
           @buffer = nil
         end
+        while /^[A-Z\d-]+[:;]/ !~ buffer_or_line
+          result = result.chomp + @buffer
+          @buffer = nil
+        end
       rescue EOFError
         return nil
       ensure
@@ -27,9 +31,9 @@ module RiCal
           raise "Invalid parameter value #{val.inspect}" unless m
           #TODO - The gsub below is a simplest fix for http://rick_denatale.lighthouseapp.com/projects/30941/tickets/19
           #       it may need further examination if more pathological cases show up.
-          param_val = m[2].sub(/^\"(.*)\"$/, '\1') 
+          param_val = m[2].sub(/^\"(.*)\"$/, '\1')
           result[m[1]] = param_val
-          result 
+          result
         }
       else
         nil
@@ -56,7 +60,7 @@ module RiCal
       end
       [parse_params(params.join(":")), values.join(":")]
     end
-    
+
     def separate_line(string) #:nodoc:
       match = string.match(/^([^;:]*)(.*)$/)
       name = match[1]
